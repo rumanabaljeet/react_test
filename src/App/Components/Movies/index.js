@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
+import isEmpty from 'is-empty';
 import ReactPaginate from 'react-paginate';
-import { Listing } from './../../Actions';
+import { Listing, Genres } from './../../Actions';
 import Search from './Search';
 import Movie from './Movie';
 
@@ -12,28 +13,22 @@ class Movies extends Component {
     super(props);
     this.state = {
       movies: [],
+      genres: [],      
       errMsg:'',
       total_pages:0,
       currentPage:0,
-      isRes : true
+      isRes : true,
+      favorites:[]
     }
   }
 
   componentDidMount() {
     this.props.Listing(1);
-  }
-
-  onSubmit = (event) => {
-    event.preventDefault();
-    event.nativeEvent.stopImmediatePropagation();
-    this.setState({
-      errMsg:''
-    })
-    let { access_token } = this.state;
-    if (access_token) {
-      this.props.Login({ access_token: access_token });
-    } else {
-      alert('enter access token');
+    this.props.Genres();
+    if(!isEmpty(localStorage.getItem('FAV_MOV'))){
+      this.setState({
+        favorites: JSON.parse(localStorage.getItem('FAV_MOV'))
+      })
     }
   }
 
@@ -48,22 +43,56 @@ class Movies extends Component {
   hanldeSearch = (event) =>{
     let search = event.target.value;
     this.setState({
-      search:search
+      search:search,
+      currentPage:1
     });
-    this.props.Listing(this.state.page,search) 
+    this.props.Listing(1,search) 
   }
 
-  componentWillReceiveProps(nextProps) {
-    const {results,total_pages} = nextProps.listing;
+  handleFavorite = (id) =>{
+    let fav_mov = [];
+    if(!isEmpty(localStorage.getItem('FAV_MOV'))){
+      fav_mov = JSON.parse(localStorage.getItem('FAV_MOV'));
+      if(fav_mov.includes(id)){
+        fav_mov.splice(fav_mov.indexOf(id,1));
+      }else{
+        fav_mov.push(id)
+      }
+    }else{
+      fav_mov.push(id);
+    }
+    localStorage.setItem('FAV_MOV', JSON.stringify(fav_mov));
     this.setState({
-      movies:results,
-      total_pages:total_pages>100?100:total_pages,
-      isRes:results.length>0?true:false
+      favorites:fav_mov
     })
   }
+  componentWillReceiveProps(nextProps) {
+    if(nextProps.listing){
+      const {results,total_pages} = nextProps.listing;
+      this.setState({
+        movies:results,
+        total_pages:total_pages>100?100:total_pages,
+        isRes:results.length>0?true:false,
+        //genres: genres
+      })
+    }
+    if(nextProps.genres){
+      const { genres } = nextProps.genres;
+      this.setState({
+        genres:genres
+      })
+    }
+    
+  }
   render() {
-    const { movies,total_pages,currentPage,isRes } = this.state;
+    const { movies,total_pages,currentPage,isRes,genres, favorites } = this.state;
     const substr = (str) => str.length > 200 ? str.substr(0, 200)+`...` :str ; 
+    const getGenres = (ids) => {
+            const res = genres.filter(genre => ids.includes(genre.id));
+            const name = res.map(val =>val.name);
+            return name.toString();
+          }
+    const checkkFav = (id)=>favorites.includes(id); 
     const centerStyle = {textAlign:'center'};
     return (
         <div className="container">
@@ -76,7 +105,7 @@ class Movies extends Component {
         </div>
         <div className="row">
           {movies.map((item, index) => {
-            return  <Movie key={index}  {...item} desc={substr(item.overview)}/>
+            return  <Movie key={index}  {...item} genres={getGenres(item.genre_ids)} desc={substr(item.overview)} onFavorite={this.handleFavorite} fav={checkkFav(item.id)}/>
              })}
           </div>
           { !isRes ?
@@ -94,18 +123,18 @@ class Movies extends Component {
 }
 
 const MapStateToProps = (state) => {
+  const res = {};
   if (state.action === 'LISTING') {
-    return {
-      listing: state.data
-    }
-  } else {
-    return {}
+    res['listing'] = state.data;
+  } 
+  if (state.action === 'GENRES') {
+    res['genres'] = state.data;
   }
-  //console.log(state);
+  return res;
 }
 
 const MapDispatchToProps = (dispatch) => {
-  return bindActionCreators({ Listing: Listing }, dispatch);
+  return bindActionCreators({ Listing: Listing, Genres: Genres }, dispatch);
 }
 
 export default connect(MapStateToProps, MapDispatchToProps)(Movies);

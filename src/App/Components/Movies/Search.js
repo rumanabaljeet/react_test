@@ -2,7 +2,7 @@ import React from 'react';
 
 const Search = (props)=>{
     return ( <div className="col-md-4 col-md-offset-4">
-        <input class="form-control" type="text" placeholder="Search..." onChange={props.onSearch} />
+        <input className="form-control" type="text" placeholder="Search..." onChange={props.onSearch} />
     </div>)
 }
 

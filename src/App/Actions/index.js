@@ -14,3 +14,16 @@ export const Listing = (page=1,search='') => {
         });
     }
 }
+
+
+export const Genres = (page=1,search='') => {
+    const apiPath = `${config.API_URL}genre/movie/list?api_key=${config.API_KEY}`;
+ return dispatch => {
+     axios.get(apiPath).then(response => {
+         dispatch({ "type": "GENRES", "payload": response.data });
+     }).catch(error => {
+         dispatch({ "type": "GENRES_ERROR", "payload": error.response.data });
+     });
+ }
+}
+
