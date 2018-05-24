@@ -3,11 +3,10 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import isEmpty from 'is-empty';
 import ReactPaginate from 'react-paginate';
-import { Link } from 'react-router-dom';
+import { Link }from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { Listing, Genres } from './../../Actions';
-import Search from './Search';
+import { Genres } from './../../Actions';
 import Movie from './../Common/Movie';
 
 
@@ -21,56 +20,45 @@ class Movies extends Component {
       total_pages:0,
       currentPage:0,
       isRes : true,
-      favorites:[]
+      favorites:[],
+      result:[]
     }
   }
 
   componentDidMount() {
-    this.props.Listing(1);
     this.props.Genres();
     if(!isEmpty(localStorage.getItem('FAV_MOV'))){
+      const  movies = JSON.parse(localStorage.getItem('FAV_MOV'));;
       this.setState({
-        favorites: JSON.parse(localStorage.getItem('FAV_MOV'))
+        movies: movies,
+        total_pages : movies.length/10,
+        result:movies.slice(0, 10)
       })
     }
   }
 
   onPageChange = (page)=>{
-    let currentPage = page.selected+1
+    const movies = this.state.movies;
+    let result = movies.slice(page.selected * 10, (page.selected + 1) * 10);
     this.setState({
-      currentPage:currentPage
+      currentPage:page.selected,
+      result:result
     })
-    this.props.Listing(currentPage,this.state.search) 
-  }
-
-  hanldeSearch = (event) =>{
-    let search = event.target.value;
-    this.setState({
-      search:search,
-      currentPage:1
-    });
-    this.props.Listing(1,search) 
   }
 
   handleFavorite = (movie) =>{
-    let fav_mov = [];
-    if(!isEmpty(localStorage.getItem('FAV_MOV'))){
-      fav_mov = JSON.parse(localStorage.getItem('FAV_MOV'));
-      let index = fav_mov.findIndex(x =>  x.id === movie.id );
-      if(index !== -1){
-        toast.success("Removed from favorite list successfully!");
+     let fav_mov = JSON.parse(localStorage.getItem('FAV_MOV'));
+     let index = fav_mov.findIndex(x =>  x.id === movie.id );
+     if(index !== -1){
         fav_mov.splice(index,1);
-      }else{
-        toast.success("Added to favorite list successfully!");
-        fav_mov.push(movie)
-      }
-    }else{
-      fav_mov.push(movie);
-    }
+        toast.success("Removed from favorite list successfully!");
+     }
     localStorage.setItem('FAV_MOV', JSON.stringify(fav_mov));
     this.setState({
-      favorites:fav_mov
-    })
+      movies:fav_mov,
+      total_pages : fav_mov.length/10,
+      result:fav_mov.slice(0, 10)
+    });
   }
 
   goToDetails = (id) =>{
@@ -78,14 +66,6 @@ class Movies extends Component {
   }
 
   componentWillReceiveProps(nextProps) {
-    if(nextProps.listing){
-      const {results,total_pages} = nextProps.listing;
-      this.setState({
-        movies:results,
-        total_pages:total_pages>100?100:total_pages,
-        isRes:results.length>0?true:false,
-      })
-    }
     if(nextProps.genres){
       const { genres } = nextProps.genres;
       this.setState({
@@ -95,41 +75,41 @@ class Movies extends Component {
     
   }
   render() {
-    const { movies,total_pages,currentPage,isRes,genres, favorites } = this.state;
+    const { result,total_pages,currentPage,genres, favorites } = this.state;
+    console.log(result,'aaaaafff');
     const substr = (str) => str.length > 200 ? str.substr(0, 200)+`...` :str ; 
     const getGenres = (ids) => {
             const res = genres.filter(genre => ids.includes(genre.id));
             const name = res.map(val =>val.name);
             return name.toString();
           }
-    const checkkFav = (id)=>favorites.findIndex(x =>  x.id === id ); 
+    const checkkFav = (id)=>favorites.includes(id); 
     const centerStyle = {textAlign:'center'};
     return (
         <div className="container">
         <div className="content">
         <div className="row">
           <div className="col-md-12">
-          <h1 style={centerStyle}>Movies</h1>
+          <h1 style={centerStyle}>Favorites</h1>
           <nav className="navbar navbar-inverse">
             <div className="container-fluid">
               <ul className="nav navbar-nav">
-                <li className="active"><Link to="/movies">Home</Link></li>
-                <li><Link to="/favorites">Favorites</Link></li>
+                <li><Link to="/movies">Home</Link></li>
+                <li className="active"><Link to="/favorites">Favorites</Link></li>
               </ul>
-             <Search onSearch={this.hanldeSearch} />
             </div>
           </nav>
           </div>
         </div>
         <div className="row">
-          {movies.map((item, index) => {
+          {result.map((item, index) => {
             return  <Movie key={index}  movie={item} genres={getGenres(item.genre_ids)} desc={substr(item.overview)} onFavorite={this.handleFavorite} viewDetals={this.goToDetails} fav={checkkFav(item.id)}/>
              })}
           </div>
-          { !isRes ?
+          { result.length < 1 ?
           <div className="col-md-12">
             <div className="category-list-card" style={{height:'auto'}}>
-                <h3 style={centerStyle}>No result found</h3>
+                <h3 style={centerStyle}>Favorite list is empty</h3>
             </div>
           </div>:
             <ReactPaginate initialPage={currentPage} activeClassName={'active'} breakLabel={''} onPageChange={this.onPageChange} containerClassName={'pagination'} pageCount={total_pages} pageRangeDisplayed={1} marginPagesDisplayed={1} />
@@ -143,9 +123,6 @@ class Movies extends Component {
 
 const MapStateToProps = (state) => {
   const res = {};
-  if (state.action === 'LISTING') {
-    res['listing'] = state.data;
-  } 
   if (state.action === 'GENRES') {
     res['genres'] = state.data;
   }
@@ -153,7 +130,7 @@ const MapStateToProps = (state) => {
 }
 
 const MapDispatchToProps = (dispatch) => {
-  return bindActionCreators({ Listing: Listing, Genres: Genres }, dispatch);
+  return bindActionCreators({ Genres: Genres }, dispatch);
 }
 
 export default connect(MapStateToProps, MapDispatchToProps)(Movies);

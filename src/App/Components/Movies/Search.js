@@ -1,9 +1,13 @@
 import React from 'react';
 
 const Search = (props)=>{
-    return ( <div className="col-md-4 col-md-offset-4">
+    return (
+        <div className="pull-right">
+             <form className="navbar-form navbar-left" >
         <input className="form-control" type="text" placeholder="Search..." onChange={props.onSearch} />
-    </div>)
+        </form>
+             </div>
+   )
 }
 
 export default Search;
