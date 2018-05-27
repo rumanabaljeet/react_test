@@ -8,6 +8,15 @@ const reducer = (state = { data: '', action: '' }, action) => {
             return { ...state, data: action.payload, action: "GENRES" }
         case "GENRES_ERROR":
             return { ...state, data:action.payload,action:"GENRES_ERROR" }
+        case "MOVIE":
+            return { ...state, data: action.payload, action: "MOVIE" }
+        case "MOVIE_ERROR":
+            return { ...state, data:action.payload,action:"MOVIE_ERROR" }
+        case "SIMILAR_MOIVE":
+            return { ...state, data: action.payload, action: "MOVIE" }
+        case "SIMILAR_MOVIE_ERROR":
+            return { ...state, data:action.payload,action:"SIMILAR_MOVIE_ERROR" }
+
         default:
             return { ...state };
     }

@@ -2,13 +2,13 @@ import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import isEmpty from 'is-empty';
-import ReactPaginate from 'react-paginate';
-import { Link } from 'react-router-dom';
+import ReactPaginate from 'react-paginate'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Listing, Genres } from './../../Actions';
-import Search from './Search';
 import Movie from './../Common/Movie';
+import Header from './../Common/Header';
+import history from './../../../Utils/history';
 
 
 class Movies extends Component {
@@ -74,7 +74,7 @@ class Movies extends Component {
   }
 
   goToDetails = (id) =>{
-    console.log(id);
+    history.push(`/movie-details/${id}`);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -107,20 +107,7 @@ class Movies extends Component {
     return (
         <div className="container">
         <div className="content">
-        <div className="row">
-          <div className="col-md-12">
-          <h1 style={centerStyle}>Movies</h1>
-          <nav className="navbar navbar-inverse">
-            <div className="container-fluid">
-              <ul className="nav navbar-nav">
-                <li className="active"><Link to="/movies">Home</Link></li>
-                <li><Link to="/favorites">Favorites</Link></li>
-              </ul>
-             <Search onSearch={this.hanldeSearch} />
-            </div>
-          </nav>
-          </div>
-        </div>
+        <Header title={'Movies'} search={true} onSearch={this.hanldeSearch} />
         <div className="row">
           {movies.map((item, index) => {
             return  <Movie key={index}  movie={item} genres={getGenres(item.genre_ids)} desc={substr(item.overview)} onFavorite={this.handleFavorite} viewDetals={this.goToDetails} fav={checkkFav(item.id)}/>

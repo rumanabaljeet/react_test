@@ -11,7 +11,7 @@ const Movie = (props,{onFavorite})=>{
                         <p>{props.desc}</p>
                         <p><b>Genres</b> : {props.genres}</p>
                         <button title="Add to Favorite" onClick={()=> props.onFavorite(props.movie)} type="button" className={"btn btn-sm " +(props.fav !== -1?'btn-danger':'btn-success')}><span className={"glyphicon " + (props.fav !== -1?'glyphicon-minus':'glyphicon-plus')}></span> </button>
-                        {/*<button type="button" class="btn btn-info pull-right" onClick={ ()=>props.viewDetals(props.movie.id) }>View Details</button>*/}
+                        <button type="button" className="btn btn-info pull-right" onClick={ ()=>props.viewDetals(props.movie.id) }>View Details</button>
                     </div>
                     
                 </div>

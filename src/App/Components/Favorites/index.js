@@ -8,6 +8,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Genres } from './../../Actions';
 import Movie from './../Common/Movie';
+import Header from './../Common/Header';
 
 
 class Movies extends Component {
@@ -87,20 +88,8 @@ class Movies extends Component {
     const centerStyle = {textAlign:'center'};
     return (
         <div className="container">
-        <div className="content">
-        <div className="row">
-          <div className="col-md-12">
-          <h1 style={centerStyle}>Favorites</h1>
-          <nav className="navbar navbar-inverse">
-            <div className="container-fluid">
-              <ul className="nav navbar-nav">
-                <li><Link to="/movies">Home</Link></li>
-                <li className="active"><Link to="/favorites">Favorites</Link></li>
-              </ul>
-            </div>
-          </nav>
-          </div>
-        </div>
+          <div className="content">
+          <Header title={'Favorites'} search={false} />
         <div className="row">
           {result.map((item, index) => {
             return  <Movie key={index}  movie={item} genres={getGenres(item.genre_ids)} desc={substr(item.overview)} onFavorite={this.handleFavorite} viewDetals={this.goToDetails} fav={checkkFav(item.id)}/>
