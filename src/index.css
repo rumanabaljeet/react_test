@@ -40,3 +40,10 @@ p{font-size:13px;}
     color: #333;
     margin-bottom: 10px;
 }
+
+.sweet-loading{
+    position: absolute;
+    top:50%;
+    z-index: 999;
+    left: 48%
+}

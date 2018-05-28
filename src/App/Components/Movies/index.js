@@ -5,6 +5,7 @@ import isEmpty from 'is-empty';
 import ReactPaginate from 'react-paginate'
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { ScaleLoader } from 'react-spinners';
 import { Listing, Genres } from './../../Actions';
 import Movie from './../Common/Movie';
 import Header from './../Common/Header';
@@ -21,7 +22,8 @@ class Movies extends Component {
       total_pages:0,
       currentPage:0,
       isRes : true,
-      favorites:[]
+      favorites:[],
+      loading:true
     }
   }
 
@@ -38,8 +40,9 @@ class Movies extends Component {
   onPageChange = (page)=>{
     let currentPage = page.selected+1
     this.setState({
-      currentPage:currentPage
-    })
+      currentPage:currentPage,
+    });
+    window.scrollTo(0, 0)
     this.props.Listing(currentPage,this.state.search) 
   }
 
@@ -49,7 +52,7 @@ class Movies extends Component {
       search:search,
       currentPage:1
     });
-    this.props.Listing(1,search) 
+    this.props.Listing(1,search);
   }
 
   handleFavorite = (movie) =>{
@@ -84,6 +87,7 @@ class Movies extends Component {
         movies:results,
         total_pages:total_pages>100?100:total_pages,
         isRes:results.length>0?true:false,
+        loading:false
       })
     }
     if(nextProps.genres){
@@ -95,7 +99,7 @@ class Movies extends Component {
     
   }
   render() {
-    const { movies,total_pages,currentPage,isRes,genres, favorites } = this.state;
+    const { movies,total_pages,currentPage,isRes,genres, favorites,loading } = this.state;
     const substr = (str) => str.length > 200 ? str.substr(0, 200)+`...` :str ; 
     const getGenres = (ids) => {
             const res = genres.filter(genre => ids.includes(genre.id));
@@ -105,7 +109,14 @@ class Movies extends Component {
     const checkkFav = (id)=>favorites.findIndex(x =>  x.id === id ); 
     const centerStyle = {textAlign:'center'};
     return (
+      
         <div className="container">
+        {loading ?
+        <div className='sweet-loading'>
+          <ScaleLoader
+            loading={loading} 
+          />
+        </div>:
         <div className="content">
         <Header title={'Movies'} search={true} onSearch={this.hanldeSearch} />
         <div className="row">
@@ -121,7 +132,7 @@ class Movies extends Component {
           </div>:
             <ReactPaginate initialPage={currentPage} activeClassName={'active'} breakLabel={''} onPageChange={this.onPageChange} containerClassName={'pagination'} pageCount={total_pages} pageRangeDisplayed={1} marginPagesDisplayed={1} />
           }
-        </div>
+        </div>}
         <ToastContainer />
       </div>
     );

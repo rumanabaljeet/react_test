@@ -42,7 +42,8 @@ export const SimilarMovies = (movie_id) => {
     const apiPath = `${config.API_URL}movie/${movie_id}/similar?api_key=${config.API_KEY}`;
     return dispatch => {
         axios.get(apiPath).then(response => {
-            dispatch({ "type": "SIMILAR_MOVIE", "payload": response.data });
+            console.log("here");
+            dispatch({ "type": "SIMILAR_MOIVES", "payload": response.data });
         }).catch(error => {
             dispatch({ "type": "SIMILAR_MOVIE_ERROR", "payload": error.response.data });
         });

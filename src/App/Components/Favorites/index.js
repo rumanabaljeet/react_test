@@ -3,12 +3,12 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import isEmpty from 'is-empty';
 import ReactPaginate from 'react-paginate';
-import { Link }from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { Genres } from './../../Actions';
 import Movie from './../Common/Movie';
 import Header from './../Common/Header';
+import history from './../../../Utils/history';
 
 
 class Movies extends Component {
@@ -44,7 +44,8 @@ class Movies extends Component {
     this.setState({
       currentPage:page.selected,
       result:result
-    })
+    });
+    window.scrollTo(0, 0)
   }
 
   handleFavorite = (movie) =>{
@@ -63,7 +64,7 @@ class Movies extends Component {
   }
 
   goToDetails = (id) =>{
-    console.log(id);
+    history.push(`/movie-details/${id}`);
   }
 
   componentWillReceiveProps(nextProps) {
