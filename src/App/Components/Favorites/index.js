@@ -78,8 +78,7 @@ class Movies extends Component {
   }
   render() {
     const { result,total_pages,currentPage,genres, favorites } = this.state;
-    console.log(result,'aaaaafff');
-    const substr = (str) => str.length > 200 ? str.substr(0, 200)+`...` :str ; 
+    const substr = (str) => str ? str.length > 200 ? str.substr(0, 200)+`...` :str :'' ; 
     const getGenres = (ids) => {
             const res = genres.filter(genre => ids.includes(genre.id));
             const name = res.map(val =>val.name);

@@ -92,7 +92,7 @@ class Movies extends Component {
   }
   render() {
     const { genres ,movie,similar_movies,favorites,loading } = this.state;
-    const substr = (str) => str.length > 180 ? str.substr(0, 180) + `...` : str;
+    const substr = (str) => str ? str.length > 180 ? str.substr(0, 180) + `...` : str : '';
     const Runtime = (time) => `${parseInt(time/60,10)}h ${time%60}m`;
     const getGenres = (ids) => {
       const res = genres.filter(genre => ids.includes(genre.id));
@@ -145,14 +145,6 @@ const checkkFav = (id)=>favorites.findIndex(x =>  x.id === id );
               return <Movie key={index} movie={item} genres={getGenres(item.genre_ids)} desc={substr(item.overview)} onFavorite={this.handleFavorite} viewDetals={this.goToDetails} fav={checkkFav(item.id)} />
             })} 
           </div>
-         {/*  {result.length < 1 ?
-            <div className="col-md-12">
-              <div className="category-list-card" style={{ height: 'auto' }}>
-                <h3 style={centerStyle}>Favorite list is empty</h3>
-              </div>
-            </div> :
-            <ReactPaginate initialPage={currentPage} activeClassName={'active'} breakLabel={''} onPageChange={this.onPageChange} containerClassName={'pagination'} pageCount={total_pages} pageRangeDisplayed={1} marginPagesDisplayed={1} />
-          } */}
         </div>}
         <ToastContainer />
       </div>
